@@ -48,8 +48,10 @@ jobs:
                 name: Setup SSH 
                 command: |
                     mkdir -p ~/.ssh
-                    echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+                    echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
                     chmod 600 ~/.ssh/id_rsa
+                    echo "Key format check:"
+                    head -n 1 ~/.ssh/id_rsa
                     ssh-keyscan $EC2_PUBLIC_DNS >> ~/.ssh/known_hosts
             - run:
                 name: deploy-application

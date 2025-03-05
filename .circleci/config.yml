@@ -48,5 +48,11 @@ jobs:
                 fingerprints:
                     - "cK1qEMs2iM5657WX3xTS94zDNt/byLqkveAF/WH6FWw"
             - run:
+                name: Debug SSH connection
+                command: | 
+                    ls -la ~/.ssh/
+                    ssh -v -o StrictHostKeyChecking=no $EC2_USERNAME@$EC2_PUBLIC_DNS "rm -rf ExampleApplication/;git clone https://github.com/SNNCI/ExampleApplication.git; source ExampleApplication/deploy.sh"
+                    
+            - run:
                 name: deploy-application
                 command: ssh -o StrictHostKeyChecking=no $EC2_USERNAME@$EC2_PUBLIC_DNS "rm -rf ExampleApplication/;git clone https://github.com/SNNCI/ExampleApplication.git; source ExampleApplication/deploy.sh"

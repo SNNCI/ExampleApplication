@@ -1,94 +1,49 @@
 version: 2.1
 
 workflows:
-  build-and-deploy:
-    jobs:
-      - build:
-          filters:
-            branches:
-              only:
-                - main
-      - deploy:
-          requires:
-            - build
-          filters:
-            branches:
-              only: 
-                - main
+    version: 2.1
+    build-and-deploy:
+        jobs:
+            - build:
+                filters:
+                    branches:
+                        only:
+                            - main
+            - deploy:
+                requires:
+                    - build
+                filters:
+                    branches:
+                        only: 
+                            - main
 
 jobs:
-  build:
-    working_directory: ~/ExampleApplication-20250204
-    docker:
-      - image: cimg/node:18.19.0
-    steps:
-      - checkout
-      - restore_cache:
-          key: dependency-cache-{{ checksum "package-lock.json" }}
-      - run:
-          name: install-npm
-          command: npm install
-      - run:
-          name: test-run
-          command: npm run test
-      - save_cache:
-          key: dependency-cache-{{ checksum "package-lock.json" }}
-          paths:
-            - ./node_modules
-  deploy:
-    docker:
-      - image: cimg/node:18.19.0
-    steps:
-      - checkout
-      - run:
-          name: Setup SSH Key
-          command: |
-            # Create SSH directory
-            mkdir -p ~/.ssh
-            
-            # Echo each line of the key separately to preserve line breaks
-            echo "-----BEGIN RSA PRIVATE KEY-----" > ~/.ssh/id_rsa
-            echo "MIIEpAIBAAKCAQEA2+3gwO8E3Vh+i0Kd6uUOvDxD80JAv7DhpxIrMppjXKzOyR1L" >> ~/.ssh/id_rsa
-            echo "Zs+O+H7ra2+Tn2LoWTYZvl5PlZaxZXCTZf9O8790R1olbMt4cNIzPA/toPHDdaTB" >> ~/.ssh/id_rsa
-            echo "VliH3YcN/yaQPqq6KRM3TnH9vkELYS8Mn8F6iiavDnHXDwpnd3ggrdsoLqbP9s4O" >> ~/.ssh/id_rsa
-            echo "aY/5cBvNQlMJcpW09yEJn5d64W74sJdkGEr7uLUd8bZnXtEjx2sjDK5n2fDTNxgm" >> ~/.ssh/id_rsa
-            echo "gu4lfHVxnc9f4lSJlXul33bsxV7LDu0VGU7aBFlZsg6TkErdQ3OgdQxaN00GQkB+" >> ~/.ssh/id_rsa
-            echo "+rI9JpRhRcwlT2r5XZFOJbaXSM3DxqSGi+y+rwIDAQABAoIBAFLLWrFHSi2KAxmq" >> ~/.ssh/id_rsa
-            echo "Gokzcjiq92m8p2OC03ByBpEmTgG1jKNpw9kQimJCZZ4sgwad1ZrAIzDnkE5gTKhD" >> ~/.ssh/id_rsa
-            echo "mTnsw2w/xyaVaUFr2AuhFmimFm9glJTVUXOQIJXlIf/MJMFyxGJyOX/uqffVxNLx" >> ~/.ssh/id_rsa
-            echo "Q29hByC7L2vgr3WaFRmEv8izmIz2zOu+reAZIGFGbaBXf7byEuTwCcmjaylXy83j" >> ~/.ssh/id_rsa
-            echo "QYgo0ZV1t33A2fsOREktwg2Scf/ZOX0Lvquzws3rzXpggEmmp8XDn+bCsLRSlvOZ" >> ~/.ssh/id_rsa
-            echo "vMZeaDMmuQmzfPgC7Eb4yTmoWvVwcfYTqffz12toQQBq+1jom3CO6FtnhloEXoAN" >> ~/.ssh/id_rsa
-            echo "J1UFAgECgYEA7g0i2yDzTNF+8JaFEeEvFxYWr414XAXMRS/plmiwmONBVkKduepb" >> ~/.ssh/id_rsa
-            echo "85KtA8ZcQV3Wn8Gg9DEum5hmgclRO1hEOPRoG9VnBc4+UJuv6eSG1akBy1y6WpqJ" >> ~/.ssh/id_rsa
-            echo "vVkT+QDEusWG7Ab8mPNBTILHHcwCnjBvTtmZXjggsieUiPNTGWIy9okCgYEA7ILy" >> ~/.ssh/id_rsa
-            echo "/IKlTWIcipaARR1V6a02XCDtGWm3ZmlHtVQviQkslwEwVoD9VHybeU4Tu2EXSCVj" >> ~/.ssh/id_rsa
-            echo "+59A4dzvG+1AG3gPzViS+3zrd36QQfCTVAuop4lXGPQ+kiiOnFOTnaJAGqcdBOnb" >> ~/.ssh/id_rsa
-            echo "o4BTOrEWLsysBUEkS5/Aj4fRT7KLUgWqquYxvXcCgYEA0Pa1BzgoeuFXlef7TdOn" >> ~/.ssh/id_rsa
-            echo "G5PnPBlqcxUf2AgT+1VQ2BR9UTRO8ll4eBrkR3EDoNm3wisdl93odOtV6E4JQZfc" >> ~/.ssh/id_rsa
-            echo "40YgcXZl5iHCb84KoL1bYwjlq1dtuoT3rkAYmTcEepNUObJ0X+sBAiG2mkBwd946" >> ~/.ssh/id_rsa
-            echo "hzPaPmv0v46hA4rdAmZCKEkCgYBwtuOYZabj3ysc/Sa6SYXFLLBobaSxZMlrvCbZ" >> ~/.ssh/id_rsa
-            echo "ivpwg3fFq2JfB3Az0ILD5+rNdTMERhWFOFtSiNlHZOUVcj2NrnW19s29EAst8bo0" >> ~/.ssh/id_rsa
-            echo "5q2E0pY4pUYgn8V/SPFjwYxtZ1EUI2NyY1jG8thQi2g7xNTIWaUKgj7FjaCKAXtZ" >> ~/.ssh/id_rsa
-            echo "oQT5dwKBgQC4jcnrod7r0ElOXEy6jKuXPmWTnXEHuQBCQmobzLmaQ4UYp8WnK86b" >> ~/.ssh/id_rsa
-            echo "FuQSxlxeVmoNffJo1lBsY5i8LjnCIXdCP4ox6GIQGBFfcDnw2CHRkvTv4TOfKWAI" >> ~/.ssh/id_rsa
-            echo "ebsE4qO4PSfeRncTR+tGj4krSn3r4v7IxwoUnOLW2BY3rnE63P6dlQ==" >> ~/.ssh/id_rsa
-            echo "-----END RSA PRIVATE KEY-----" >> ~/.ssh/id_rsa
-            
-            # Set proper permissions
-            chmod 600 ~/.ssh/id_rsa
-            
-            # Check that the key is valid and display fingerprint
-            echo "Verifying key format:"
-            ssh-keygen -lf ~/.ssh/id_rsa
-            
-            # Add server to known hosts
-            ssh-keyscan -H $EC2_PUBLIC_DNS >> ~/.ssh/known_hosts
-      - run:
-          name: Deploy Application
-          command: |
-            echo "Testing SSH connection:"
-            ssh -o StrictHostKeyChecking=no $EC2_USERNAME@$EC2_PUBLIC_DNS "echo 'SSH connection successful'"
-            
-            echo "Proceeding with deployment:"
-            ssh -o StrictHostKeyChecking=no $EC2_USERNAME@$EC2_PUBLIC_DNS "rm -rf ExampleApplication/;git clone https://github.com/SNNCI/ExampleApplication.git; source ExampleApplication/deploy.sh"
+    build:
+        working_directory: ~/ExampleApplication-20250204
+        docker:
+            - image: circleci/node:10.16.3
+        steps:
+            - checkout
+            - run:
+                name: update-npm
+                command: 'sudo npm install -g npm@5'
+            - restore_cache:
+                key: dependency-cache-{{ checksum "package-lock.json" }}
+            - run:
+                name: install-npm
+                command: npm install
+            - run:
+                name: test-run
+                command: npm run test
+            - save_cache:
+                key: dependency-cache-{{ checksum "package-lock.json" }}
+                paths:
+                    - ./node_modules
+    deploy:
+        docker:
+            - image: circleci/node:10.16.3
+
+        steps:
+            - run:
+                name: deploy-application
+                command: ssh -o StrictHostKeyChecking=no $EC2_USERNAME@$EC2_PUBLIC_DNS "rm -rf ExampleApplication/;git clone https://github.com/SNNCI/ExampleApplication.git; source ExampleApplication/deploy.sh"

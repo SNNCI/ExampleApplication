@@ -40,20 +40,29 @@ jobs:
       - image: cimg/node:18.19.0
     steps:
       - checkout
-      # Use CircleCI's built-in SSH key management
-      - add_ssh_keys:
-          fingerprints:
-            - "xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx" # Replace with your key fingerprint
+      # Since we have the SHA256 fingerprint instead of MD5, let's use the key directly
       - run:
-          name: Setup SSH Known Hosts
+          name: Setup SSH
           command: |
             mkdir -p ~/.ssh
+            # Create SSH key file - use an environment variable called SSH_PRIVATE_KEY_FILE 
+            # that contains the entire private key with proper line breaks
+            echo "$SSH_PRIVATE_KEY_FILE" > ~/.ssh/id_rsa
+            chmod 600 ~/.ssh/id_rsa
+            
+            # Add EC2 host to known hosts
             ssh-keyscan -H $EC2_PUBLIC_DNS >> ~/.ssh/known_hosts
+            
+            # Verify key is readable
+            ls -la ~/.ssh/
+            
+            echo "Testing key format:"
+            ssh-keygen -l -f ~/.ssh/id_rsa
       - run:
           name: deploy-application
           command: |
             echo "Testing SSH connection:"
-            ssh $EC2_USERNAME@$EC2_PUBLIC_DNS "echo 'SSH connection successful'"
+            ssh -o StrictHostKeyChecking=no $EC2_USERNAME@$EC2_PUBLIC_DNS "echo 'SSH connection successful'"
             
             echo "Proceeding with deployment:"
-            ssh $EC2_USERNAME@$EC2_PUBLIC_DNS "rm -rf ExampleApplication/;git clone https://github.com/SNNCI/ExampleApplication.git; source ExampleApplication/deploy.sh"
+            ssh -o StrictHostKeyChecking=no $EC2_USERNAME@$EC2_PUBLIC_DNS "rm -rf ExampleApplication/;git clone https://github.com/SNNCI/ExampleApplication.git; source ExampleApplication/deploy.sh"

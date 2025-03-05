@@ -44,6 +44,11 @@ jobs:
             - image: cimg/node:10.16.3
         steps:
             - checkout
+            - run:
+                name: Setup SSH directory
+                command: |
+                    mkdir -p ~/.ssh
+                    chmod 700 ~/.ssh
             - add_ssh_keys:
                 fingerprints:
                     - "cK1qEMs2iM5657WX3xTS94zDNt/byLqkveAF/WH6FWw"
